@@ -39,6 +39,10 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.txtCodigo = new System.Windows.Forms.TextBox();
+            this.panel8 = new System.Windows.Forms.Panel();
+            this.btnSintactico = new System.Windows.Forms.Button();
+            this.panel9 = new System.Windows.Forms.Panel();
+            this.dtgSintactico = new System.Windows.Forms.DataGridView();
             this.panel1.SuspendLayout();
             this.panel7.SuspendLayout();
             this.panel6.SuspendLayout();
@@ -46,10 +50,14 @@
             this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dtgLexico)).BeginInit();
             this.panel4.SuspendLayout();
+            this.panel8.SuspendLayout();
+            this.panel9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dtgSintactico)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.panel8);
             this.panel1.Controls.Add(this.panel7);
             this.panel1.Controls.Add(this.panel6);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -97,6 +105,7 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.panel9);
             this.panel2.Controls.Add(this.panel5);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel2.Location = new System.Drawing.Point(600, 0);
@@ -154,6 +163,49 @@
             this.txtCodigo.TabIndex = 0;
             this.txtCodigo.Text = "#Ejemplo\r\n*int x=0;\r\nif(x==0)\r\n$\r\nRun.Up(500,\"front\");\r\n$$";
             // 
+            // panel8
+            // 
+            this.panel8.Controls.Add(this.btnSintactico);
+            this.panel8.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel8.Location = new System.Drawing.Point(300, 0);
+            this.panel8.Name = "panel8";
+            this.panel8.Size = new System.Drawing.Size(300, 100);
+            this.panel8.TabIndex = 2;
+            // 
+            // btnSintactico
+            // 
+            this.btnSintactico.Location = new System.Drawing.Point(95, 20);
+            this.btnSintactico.Name = "btnSintactico";
+            this.btnSintactico.Size = new System.Drawing.Size(110, 60);
+            this.btnSintactico.TabIndex = 0;
+            this.btnSintactico.Text = "Compilar Sintáctico";
+            this.btnSintactico.UseVisualStyleBackColor = true;
+            this.btnSintactico.Visible = false;
+            this.btnSintactico.Click += new System.EventHandler(this.btnSintactico_Click);
+            // 
+            // panel9
+            // 
+            this.panel9.Controls.Add(this.dtgSintactico);
+            this.panel9.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel9.Location = new System.Drawing.Point(0, 200);
+            this.panel9.Name = "panel9";
+            this.panel9.Size = new System.Drawing.Size(600, 200);
+            this.panel9.TabIndex = 2;
+            // 
+            // dtgSintactico
+            // 
+            this.dtgSintactico.AllowUserToAddRows = false;
+            this.dtgSintactico.AllowUserToDeleteRows = false;
+            this.dtgSintactico.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dtgSintactico.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dtgSintactico.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dtgSintactico.Location = new System.Drawing.Point(0, 0);
+            this.dtgSintactico.Name = "dtgSintactico";
+            this.dtgSintactico.ReadOnly = true;
+            this.dtgSintactico.RowHeadersVisible = false;
+            this.dtgSintactico.Size = new System.Drawing.Size(600, 200);
+            this.dtgSintactico.TabIndex = 1;
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -177,6 +229,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.dtgLexico)).EndInit();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
+            this.panel8.ResumeLayout(false);
+            this.panel9.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dtgSintactico)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -194,6 +249,10 @@
         private System.Windows.Forms.TextBox txtCodigo;
         private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.Button btnTodo;
+        private System.Windows.Forms.Panel panel8;
+        private System.Windows.Forms.Button btnSintactico;
+        private System.Windows.Forms.Panel panel9;
+        private System.Windows.Forms.DataGridView dtgSintactico;
     }
 }
 

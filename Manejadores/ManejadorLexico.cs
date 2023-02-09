@@ -12,7 +12,7 @@ namespace Manejadores
     public class ManejadorLexico
     {
         public List<TokensLexico> _tokens = new List<TokensLexico>();
-        public void HacerLexico(string codigo,DataGridView tabla)
+        public List<TokensLexico> HacerLexico(string codigo,DataGridView tabla)
         {
             int contador = 1;
             _tokens.Clear();
@@ -22,6 +22,14 @@ namespace Manejadores
             codigo = codigo.Replace(")", " ) ");
             codigo = codigo.Replace(",", " , ");
             codigo = codigo.Replace(";", " ; ");
+            codigo = codigo.Replace("+", " + ");
+            codigo = codigo.Replace("-", " - ");
+            codigo = codigo.Replace("*", " * ");
+            codigo = codigo.Replace("/", " / ");
+            codigo = codigo.Replace("* int", "*int");
+            codigo = codigo.Replace("* decimal", "*decimal");
+            codigo = codigo.Replace("* string", "*string");
+            codigo = codigo.Replace("*bool", "bool");
 
             string[] lineas = codigo.Split('\n');
 
@@ -40,7 +48,6 @@ namespace Manejadores
                         }
                         
                     }
-
                     /*_tokens.Add(new TokensLexico
                     {
                         Id= i,
@@ -64,6 +71,7 @@ namespace Manejadores
             }
 
             tabla.DataSource= _tokens.ToList();
+            return _tokens;
         }
 
         private TokensLexico generarToken(int i1, string v, int i2)
@@ -107,7 +115,7 @@ namespace Manejadores
             {
                 return "Operador de comparación";
             }
-            else if (v.Contains("="))
+            else if (v.Equals("="))
             {
                 return "Operador de asignación";
 
