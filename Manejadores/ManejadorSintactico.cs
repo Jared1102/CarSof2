@@ -11,8 +11,9 @@ namespace Manejadores
     public class ManejadorSintactico
     {
         private List<ErroresSintacticos> errosSintacticos=new List<ErroresSintacticos>();
-        private List<TokensLexico> instruccion = new List<TokensLexico>();
+        //private List<TokensLexico> instruccion = new List<TokensLexico>();
         private int contador = 1;
+        private TokensLexico _auxtokensLexico = null;
         public void HacerSintactico(List<TokensLexico> tokens, DataGridView tabla)
         {
             errosSintacticos.Clear();
@@ -32,14 +33,79 @@ namespace Manejadores
                     case "Valor númerico decimal":
                         sintaxisValor(tokens[i], tokens[i + 1]);
                         break;
+                    case "Condicional":
+                        sintaxisCondicional(tokens[i], tokens[i + 1]);
+                        break;
+                    case "Apertura de parametros":
+                        sintaxisAperturaDeParametros(tokens[i]);
+                        break;
+                    case "Cierre de parametros":
+                        sintaxisCierraDeParametros(tokens[i]);
+                        break;
                     default:
                         break;
                 }
             }
 
+            if (_auxtokensLexico!=null)
+            {
+                errosSintacticos.Add(new ErroresSintacticos
+                {
+                    Error = "Se esperaba )",
+                    Id = contador,
+                    Linea = _auxtokensLexico.Linea.ToString(),
+                    Recomendacion = "Agregar un (",
+                    Token = _auxtokensLexico.Texto
+                });
+
+                contador++;
+
+                _auxtokensLexico = null;
+            }
+
             if (errosSintacticos.Count>0)
             {
                 tabla.DataSource = errosSintacticos.ToList();
+            }
+        }
+
+        private void sintaxisCierraDeParametros(TokensLexico tokensLexico)
+        {
+            if (_auxtokensLexico==null)
+            {
+                errosSintacticos.Add(new ErroresSintacticos
+                {
+                    Error = "Se esperaba (",
+                    Id = contador,
+                    Linea = tokensLexico.Linea.ToString(),
+                    Recomendacion = "Agregar un (",
+                    Token = tokensLexico.Texto
+                });
+                
+                contador++;
+                _auxtokensLexico = null;
+            }
+            
+        }
+
+        private void sintaxisAperturaDeParametros(TokensLexico tokensLexico)
+        {
+            _auxtokensLexico = tokensLexico;
+        }
+
+        private void sintaxisCondicional(TokensLexico tokensLexico1, TokensLexico tokensLexico2)
+        {
+            if (!string.Equals(tokensLexico2.Tipo, "Apertura de parametros"))
+            {
+                errosSintacticos.Add(new ErroresSintacticos
+                {
+                    Error = "Se esperaba (",
+                    Id = contador,
+                    Linea = tokensLexico1.Linea.ToString(),
+                    Recomendacion = "Agregar un (",
+                    Token = string.Format("{0} {1}", tokensLexico1.Texto, tokensLexico2.Texto)
+                });
+                contador++;
             }
         }
 

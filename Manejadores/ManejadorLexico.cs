@@ -99,7 +99,7 @@ namespace Manejadores
             {
                 return "Valor booleano";
             }
-            else if(v.Contains("if")){
+            else if(v.Equals("if")){
                 return "Condicional";
             }else if (instrucciones.Contains(v))
             {
