@@ -83,9 +83,10 @@ namespace Manejadores
                 });
                 
                 contador++;
-                _auxtokensLexico = null;
+                
             }
-            
+            _auxtokensLexico = null;
+
         }
 
         private void sintaxisAperturaDeParametros(TokensLexico tokensLexico)

@@ -38,13 +38,17 @@ namespace Manejadores
                 if (Regex.IsMatch(lineas[i],"#"))
                 {
                     string[] comentario = Regex.Split(lineas[i], "#");
-                    if (!string.IsNullOrEmpty(comentario[0]) && !string.IsNullOrWhiteSpace(comentario[0]))
+                    if (!string.IsNullOrEmpty(comentario[0]) && !string.IsNullOrWhiteSpace(comentario[0]) && comentario[0]!=null)
                     {
                         string[] tnt = comentario[0].Split(' ');
                         for (int j = 0; j < tnt.Length; j++)
                         {
-                            _tokens.Add(generarToken(contador, tnt[j], i + 1));
-                            contador++;
+                            if (!string.IsNullOrEmpty(tnt[j]) && !string.IsNullOrWhiteSpace(tnt[j]))
+                            {
+                                _tokens.Add(generarToken(contador, tnt[j], i + 1));
+                                contador++;
+                            }
+                            
                         }
                         
                     }
