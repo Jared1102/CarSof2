@@ -114,7 +114,6 @@
             // panel4
             // 
             this.panel4.Controls.Add(this.txtCodigo);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel4.Location = new System.Drawing.Point(0, 100);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(600, 500);

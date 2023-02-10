@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArbolSintactico.cs" />
     <Compile Include="ErroresSintacticos.cs" />
     <Compile Include="TokensLexico.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
