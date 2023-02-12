@@ -114,7 +114,7 @@ namespace Manejadores
                 return "Identificador";
             }else if (operadorAritmetico.Contains(v))
             {
-                return "Operador aritmetico";
+                return "Operador aritmético";
             }else if (operadorComparacion.Contains(v))
             {
                 return "Operador de comparación";

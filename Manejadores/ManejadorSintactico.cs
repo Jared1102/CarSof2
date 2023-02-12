@@ -10,200 +10,710 @@ namespace Manejadores
 {
     public class ManejadorSintactico
     {
-        private List<ErroresSintacticos> errosSintacticos=new List<ErroresSintacticos>();
+        private List<ErroresSintacticos> _erroresSintacticos;
+        private List<ArbolSintactico> _arbolesSintacticos;
         private int contador;
-        private bool continuar=true;
-        private TokensLexico _auxtokensLexico = null;
+
+
         public void HacerSintactico(List<TokensLexico> tokens, DataGridView tabla)
         {
-            contador = 1;
-            errosSintacticos.Clear();
-            tabla.Columns.Clear();
-            for (int i = 0; i < tokens.Count-1; i++)
+            _erroresSintacticos = new List<ErroresSintacticos>();
+            _arbolesSintacticos=new List<ArbolSintactico>();
+            ArbolSintactico arbolSintactico=null;
+            contador = 0;
+
+
+            //Juntar tokens para las instrucciones
+            List<TokensLexico> tokensLexicos=new List<TokensLexico>();
+
+            for (int i = 0; i < tokens.Count; i++)
             {
-                switch (tokens[i].Tipo)
+                tokensLexicos.Add(tokens[i]);
+                if (tokens[i].Tipo.Equals("Cierre de parametros") && tokensLexicos[0].Tipo.Equals("Condicional"))
                 {
-                    case "Tipo de dato":
-                        sintaxisTipoDeDato(tokens[i], tokens[i + 1]);
+                    sintaxisCondicional(tokensLexicos);
+                    arbolSintactico = new ArbolSintactico()
+                    {
+                        Nombre = "Condición",
+                        TokensLexicos = tokensLexicos
+                    };
+                    tokensLexicos.Clear();
+                }
+                else if (tokens[i].Tipo.Equals("Separador de instrucción") || 
+                    tokens[i].Tipo.Equals("Cierre de bloque")||
+                    tokens[i].Tipo.Equals("Apertura de bloque"))
+                {
+                    switch (tokensLexicos[0].Tipo)
+                    {
+                        case "Tipo de dato":
+                            sintaxisDeclararVariable(tokensLexicos);
+                            arbolSintactico=new ArbolSintactico()
+                            {
+                                Nombre="Declaración de variable",
+                                TokensLexicos=tokensLexicos
+                            };
+                            tokensLexicos.Clear();
+                            break;
+                        case "Identificador":
+                            sintaxisExpresionAsignacion(tokensLexicos);
+                            arbolSintactico = new ArbolSintactico()
+                            {
+                                Nombre = "Expresión de asignación",
+                                TokensLexicos = tokensLexicos
+                            };
+                            tokensLexicos.Clear();
+                            break;
+                        
+                        case "Cierre de bloque":
+                            arbolSintactico = new ArbolSintactico()
+                            {
+                                Nombre = "Cierre de bloque",
+                                TokensLexicos = tokensLexicos
+                            };
+                            tokensLexicos.Clear();
+                            break;
+                        case "Apertura de bloque":
+                            arbolSintactico = new ArbolSintactico()
+                            {
+                                Nombre = "Apertura de bloque",
+                                TokensLexicos = tokensLexicos
+                            };
+                            tokensLexicos.Clear();
+                            break;
+                        case "Valor booleano":
+                        case "Valor textual":
+                        case "Valor númerico entero":
+                        case "Valor númerico decimal":
+                            contador++;
+                            _erroresSintacticos.Add(new ErroresSintacticos()
+                            {
+                                Error = "La expresión utilizada no coincide con alguna instrucción posible",
+                                Id = contador,
+                                Linea = tokens[i].Linea.ToString(),
+                                Recomendacion = "Reformular instrucción",
+                                Token = tokens[i].Texto
+                            });
+                            tokensLexicos.Clear();
+                            break;
+                        case "Instrucción":
+                            sintaxisInstrucciones(tokensLexicos);
+                            arbolSintactico = new ArbolSintactico()
+                            {
+                                Nombre = "Instrucción",
+                                TokensLexicos= tokensLexicos
+                            };
+                            tokensLexicos.Clear();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (arbolSintactico!=null)
+                {
+                    _arbolesSintacticos.Add(arbolSintactico);
+                    arbolSintactico= null;
+                }
+
+                if (contador>0)
+                {
+                    i=tokens.Count-1;
+                    _arbolesSintacticos.Clear();
+                }
+            }
+
+            if (tokensLexicos.Count>0)
+            {
+                contador++;
+                _erroresSintacticos.Add(new ErroresSintacticos()
+                {
+                    Error = "Se esperaba un ;",
+                    Id = contador,
+                    Linea = tokensLexicos[tokensLexicos.Count-1].Linea.ToString(),
+                    Recomendacion = "Agregar un ;",
+                    Token = tokensLexicos[tokensLexicos.Count-1].Texto
+                });
+                _arbolesSintacticos.Clear();
+            }
+
+            tabla.DataSource = _erroresSintacticos.ToList();
+        }
+
+        private void sintaxisInstrucciones(List<TokensLexico> tokensLexicos)
+        {
+            switch (tokensLexicos[0].Texto)
+            {
+                case "Run.Up":
+                    {
+                        sintaxisRunUp(tokensLexicos);
+                    }
                     break;
-                    case "Identificador":
-                        sintaxisIdentificador(tokens[i], tokens[i + 1]); break;
-                    case "Operador de asignación":
-                        sintaxisAsignacion(tokens[i], tokens[i + 1]); break;
+                case "Run.Stop":
+                case "On":
+                case "Off":
+                    {
+                        sintaxisInstruccionesVacias(tokensLexicos);
+                    }
+                    break;
+                case "Run.Turn":
+                case "wait":
+                    {
+                        sintaxisInstruccionesUnParametro(tokensLexicos);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void sintaxisInstruccionesUnParametro(List<TokensLexico> tokensLexicos)
+        {
+            for (int i = 0; i < tokensLexicos.Count - 1; i++)
+            {
+                switch (tokensLexicos[i].Tipo)
+                {
+                    case "Instrucción":
+                        {
+                            if (!tokensLexicos[i + 1].Tipo.Equals("Apertura de parametros"))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba una apertura de parametros",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar una apertura de parametros",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Apertura de parametros":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Operador aritmético":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
                     case "Valor booleano":
                     case "Valor textual":
                     case "Valor númerico entero":
                     case "Valor númerico decimal":
-                        sintaxisValor(tokens[i], tokens[i + 1]);
-                        break;
-                    case "Condicional":
-                        sintaxisCondicional(tokens[i], tokens[i + 1]);
-                        break;
-                    case "Apertura de parametros":
-                        sintaxisAperturaDeParametros(tokens[i], tokens[i+1]);
-                        break;
-                    case "Cierre de parametros":
-                        sintaxisCierraDeParametros(tokens[i]);
+                    case "Identificador":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Operador de comparación") || tokensLexicos[i + 1].Tipo.Equals("Cierre de parametros") ||
+                                tokensLexicos[i + 1].Tipo.Equals("Operador de aritmético")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un operador de comparación, aritmético o un )",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un operador de comparación, aritmético o un )",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
                         break;
                     default:
                         break;
                 }
+            }
+        }
 
-                if (!continuar)
+        private void sintaxisInstruccionesVacias(List<TokensLexico> tokensLexicos)
+        {
+            for (int i = 0; i < tokensLexicos.Count-1; i++)
+            {
+                switch (tokensLexicos[i].Tipo)
                 {
-                    i = tokens.Count - 1;
+                    case "Instrucción":
+                        {
+                            if (!tokensLexicos[i + 1].Tipo.Equals("Apertura de parametros"))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba una apertura de parametros",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar una apertura de parametros",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Apertura de parametros":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Cierre de parametros")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Esta instrucción no requiere de parametros",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Retirar los parametros",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Cierre de parametros":
+                        {
+                            if (!tokensLexicos[i+1].Tipo.Equals("Separador de instrucción"))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un ;",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Colocar un ;",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
+        }
 
-            if (_auxtokensLexico!=null && continuar)
+        private void sintaxisRunUp(List<TokensLexico> tokensLexicos)
+        {
+            for (int i = 0; i < tokensLexicos.Count-1; i++)
             {
-                errosSintacticos.Add(new ErroresSintacticos
+                switch (tokensLexicos[i].Tipo)
                 {
-                    Error = "Se esperaba )",
-                    Id = contador,
-                    Linea = _auxtokensLexico.Linea.ToString(),
-                    Recomendacion = "Agregar un (",
-                    Token = _auxtokensLexico.Texto
-                });
-
-                contador++;
-
-                _auxtokensLexico = null;
-            }
-
-            if (errosSintacticos.Count>0)
-            {
-                tabla.DataSource = errosSintacticos.ToList();
+                    case "Instrucción":
+                        {
+                            if (!tokensLexicos[i + 1].Tipo.Equals("Apertura de parametros"))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba una apertura de parametros",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar una apertura de parametros",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Apertura de parametros":
+                        {
+                            if (!(tokensLexicos[i+1].Tipo.Equals("Identificador") || tokensLexicos[i+1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Operador aritmético":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Valor booleano":
+                    case "Valor textual":
+                    case "Valor númerico entero":
+                    case "Valor númerico decimal":
+                    case "Identificador":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Operador de comparación") || tokensLexicos[i + 1].Tipo.Equals("Cierre de parametros") ||
+                                tokensLexicos[i + 1].Tipo.Equals("Operador de aritmético")|| tokensLexicos[i+1].Tipo.Equals("Separador")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un operador de comparación, aritmético o un )",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un operador de comparación, aritmético o un )",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Separador":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
-        private void sintaxisCierraDeParametros(TokensLexico tokensLexico)
+        private void sintaxisCondicional(List<TokensLexico> tokensLexicos)
         {
-            if (_auxtokensLexico==null)
+            for (int i = 0; i < tokensLexicos.Count-1; i++)
             {
-                errosSintacticos.Add(new ErroresSintacticos
+                switch (tokensLexicos[i].Tipo)
                 {
-                    Error = "Se esperaba (",
-                    Id = contador,
-                    Linea = tokensLexico.Linea.ToString(),
-                    Recomendacion = "Agregar un (",
-                    Token = tokensLexico.Texto
-                });
-                
-                contador++;
-                continuar = false;
-            }
-            _auxtokensLexico = null;
+                    case "Condicional":
+                        {
+                            if (!tokensLexicos[i+1].Tipo.Equals("Apertura de parametros"))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba una apertura de parametros",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar una apertura de parametros",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Apertura de parametros":
+                        {
+                            if (!(tokensLexicos[i+1].Tipo.Equals("Identificador") || tokensLexicos[i+1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
 
-        }
-
-        private void sintaxisAperturaDeParametros(TokensLexico tokensLexico1, TokensLexico tokensLexico2)
-        {
-            if (!string.Equals(tokensLexico2.Tipo, "Identificador") && !tokensLexico2.Tipo.Contains("Valor"))
-            {
-                errosSintacticos.Add(new ErroresSintacticos
-                {
-                    Error = "Se esperaba un identificador o un valor",
-                    Id = contador,
-                    Linea = tokensLexico1.Linea.ToString(),
-                    Recomendacion = "Agregar un identificador o valor",
-                    Token = string.Format("{0} {1}", tokensLexico1.Texto, tokensLexico2.Texto)
-                });
-                contador++;
-                continuar = false;
-            }
-            _auxtokensLexico = tokensLexico1;
-        }
-
-        private void sintaxisCondicional(TokensLexico tokensLexico1, TokensLexico tokensLexico2)
-        {
-            if (!string.Equals(tokensLexico2.Tipo, "Apertura de parametros"))
-            {
-                errosSintacticos.Add(new ErroresSintacticos
-                {
-                    Error = "Se esperaba (",
-                    Id = contador,
-                    Linea = tokensLexico1.Linea.ToString(),
-                    Recomendacion = "Agregar un (",
-                    Token = string.Format("{0} {1}", tokensLexico1.Texto, tokensLexico2.Texto)
-                });
-                contador++;
-                continuar = false;
-            }
-        }
-
-        private void sintaxisValor(TokensLexico tokensLexico1, TokensLexico tokensLexico2)
-        {
-            if (!string.Equals("Operador aritmetico",tokensLexico2.Tipo) && 
-                !string.Equals("Separador de instrucción",tokensLexico2.Tipo) && 
-                !string.Equals("Cierre de parametros", tokensLexico2.Tipo) && 
-                !string.Equals("Separador",tokensLexico2.Tipo))
-            {
-                errosSintacticos.Add(new ErroresSintacticos
-                {
-                    Error = "Se esperaba un operador aritmetico, un ; o )",
-                    Id = contador,
-                    Linea = tokensLexico1.Linea.ToString(),
-                    Recomendacion = "Agregar un +,-,/,* o ;",
-                    Token = string.Format("{0} {1}", tokensLexico1.Texto, tokensLexico2.Texto)
-                });
-                contador++;
-                continuar = false;
+                    case "Valor booleano":
+                    case "Valor textual":
+                    case "Valor númerico entero":
+                    case "Valor númerico decimal":
+                    case "Identificador":
+                        {
+                            if (!(tokensLexicos[i+1].Tipo.Equals("Operador de comparación") || tokensLexicos[i+1].Tipo.Equals("Cierre de parametros") ||
+                                tokensLexicos[i + 1].Tipo.Equals("Operador de aritmético")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un operador de comparación, aritmético o un )",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un operador de comparación, aritmético o un )",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                }
             }
         }
 
-        private void sintaxisAsignacion(TokensLexico tokensLexico1, TokensLexico tokensLexico2)
+        private void sintaxisExpresionAsignacion(List<TokensLexico> tokensLexicos)
         {
-            if (!string.Equals("Identificador",tokensLexico2.Tipo) && !tokensLexico2.Tipo.Contains("Valor"))
+            bool operadorAsignacion = false;
+            for (int i = 0; i < tokensLexicos.Count - 1; i++)
             {
-                errosSintacticos.Add(new ErroresSintacticos
+                switch (tokensLexicos[i].Tipo)
                 {
-                    Error = "Se esperaba un identificador o un valor",
-                    Id = contador,
-                    Linea = tokensLexico1.Linea.ToString(),
-                    Recomendacion = "Agregar un identificador o valor",
-                    Token = string.Format("{0} {1}", tokensLexico1.Texto, tokensLexico2.Texto)
-                });
-                contador++;
-                continuar = false;
+                    case "Identificador":
+                        {
+                            if (operadorAsignacion)
+                            {
+                                if (!(tokensLexicos[i + 1].Tipo.Equals("Separador de instrucción") || tokensLexicos[i + 1].Tipo.Equals("Operador de asignación")
+                                || tokensLexicos[i + 1].Tipo.Equals("Operador aritmético")))
+                                {
+                                    contador++;
+                                    _erroresSintacticos.Add(new ErroresSintacticos()
+                                    {
+                                        Error = "Se esperaba un ;, un Operador de asignación o aritmético",
+                                        Id = contador,
+                                        Linea = tokensLexicos[i].Linea.ToString(),
+                                        Recomendacion = "Agregar un identificador a la declaración de variable",
+                                        Token = tokensLexicos[i].Texto
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                if (!(tokensLexicos[i + 1].Tipo.Equals("Separador de instrucción") || tokensLexicos[i + 1].Tipo.Equals("Operador de asignación")))
+                                {
+                                    contador++;
+                                    _erroresSintacticos.Add(new ErroresSintacticos()
+                                    {
+                                        Error = "Se esperaba un ; o un Operador de asignación",
+                                        Id = contador,
+                                        Linea = tokensLexicos[i].Linea.ToString(),
+                                        Recomendacion = "Agregar un identificador a la declaración de variable",
+                                        Token = tokensLexicos[i].Texto
+                                    });
+                                }
+                            }
+
+
+                        }
+                        break;
+                    case "Operador de asignación":
+                        {
+                            if (!operadorAsignacion)
+                            {
+                                operadorAsignacion = true;
+                                if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                                {
+                                    contador++;
+                                    _erroresSintacticos.Add(new ErroresSintacticos()
+                                    {
+                                        Error = "Se esperaba un identificador o un valor",
+                                        Id = contador,
+                                        Linea = tokensLexicos[i].Linea.ToString(),
+                                        Recomendacion = "Agregar un identificador o un valor",
+                                        Token = tokensLexicos[i].Texto
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "No se puede usar más de 1 vez el operador de asignación",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Retirar el operador de asignación",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Operador aritmético":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Valor booleano":
+                    case "Valor textual":
+                    case "Valor númerico entero":
+                    case "Valor númerico decimal":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Operador aritmético") || tokensLexicos[i+1].Tipo.Equals("Separador de instrucción")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un operador aritmético o un ;",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un operador aritmético o un ;",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
-        private void sintaxisIdentificador(TokensLexico tokensLexico1, TokensLexico tokensLexico2)
+        private void sintaxisDeclararVariable(List<TokensLexico> tokensLexicos)
         {
-            if (!string.Equals(tokensLexico2.Tipo, "Operador de asignación") && 
-                !string.Equals(tokensLexico2.Tipo, "Separador de instrucción") && 
-                !string.Equals(tokensLexico2.Tipo, "Operador de comparación") && 
-                !string.Equals(tokensLexico2.Tipo,"Cierre de parametros") &&
-                tokensLexico2.Tipo.Contains("Valor"))
+            bool operadorAsignacion=false;
+            for (int i = 0; i < tokensLexicos.Count-1; i++)
             {
-                errosSintacticos.Add(new ErroresSintacticos
+                switch (tokensLexicos[i].Tipo)
                 {
-                    Error = "Se esperaba un ; o un operador",
-                    Id = contador,
-                    Linea = tokensLexico1.Linea.ToString(),
-                    Recomendacion = "Agregar un ; o una asignación de valor",
-                    Token = string.Format("{0} {1}", tokensLexico1.Texto, tokensLexico2.Texto)
-                });
-                contador++;
-                continuar = false;
-            }
-        }
+                    case "Tipo de dato":
+                        {
+                            if (!tokensLexicos[i + 1].Tipo.Equals("Identificador"))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador a la declaración de variable",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Identificador":
+                        {
+                            if (operadorAsignacion)
+                            {
+                                if (!(tokensLexicos[i + 1].Tipo.Equals("Separador de instrucción") || tokensLexicos[i + 1].Tipo.Equals("Operador de asignación")
+                                || tokensLexicos[i + 1].Tipo.Equals("Operador aritmético")))
+                                {
+                                    contador++;
+                                    _erroresSintacticos.Add(new ErroresSintacticos()
+                                    {
+                                        Error = "Se esperaba un ;, un Operador de asignación o aritmético",
+                                        Id = contador,
+                                        Linea = tokensLexicos[i].Linea.ToString(),
+                                        Recomendacion = "Agregar un identificador a la declaración de variable",
+                                        Token = tokensLexicos[i].Texto
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                if (!(tokensLexicos[i + 1].Tipo.Equals("Separador de instrucción") || tokensLexicos[i + 1].Tipo.Equals("Operador de asignación")))
+                                {
+                                    contador++;
+                                    _erroresSintacticos.Add(new ErroresSintacticos()
+                                    {
+                                        Error = "Se esperaba un ; o un Operador de asignación",
+                                        Id = contador,
+                                        Linea = tokensLexicos[i].Linea.ToString(),
+                                        Recomendacion = "Agregar un identificador a la declaración de variable",
+                                        Token = tokensLexicos[i].Texto
+                                    });
+                                }
+                            }
+                            
 
-        private void sintaxisTipoDeDato(TokensLexico tokensLexico1, TokensLexico tokensLexico2)
-        {
-            if (!string.Equals(tokensLexico2.Tipo, "Identificador"))
-            {
-                errosSintacticos.Add(new ErroresSintacticos
-                {
-                    Error = "Se esperaba un identificador en la declaración de variable",
-                    Id=contador,
-                    Linea=tokensLexico1.Linea.ToString(),
-                    Recomendacion="Agregar un identificador",
-                    Token=string.Format("{0} {1}",tokensLexico1.Texto,tokensLexico2.Texto)
-                });
-                contador++;
-                continuar = false;
+                        }
+                        break;
+                    case "Operador de asignación":
+                        {
+                            if (!operadorAsignacion)
+                            {
+                                operadorAsignacion= true;
+                                if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                                {
+                                    contador++;
+                                    _erroresSintacticos.Add(new ErroresSintacticos()
+                                    {
+                                        Error = "Se esperaba un identificador o un valor",
+                                        Id = contador,
+                                        Linea = tokensLexicos[i].Linea.ToString(),
+                                        Recomendacion = "Agregar un identificador o un valor",
+                                        Token = tokensLexicos[i].Texto
+                                    });
+                                }
+                            }
+                            else{
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "No se puede usar más de 1 vez el operador de asignación",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Retirar el operador de asignación",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Operador aritmético":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un identificador o un valor",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un identificador o un valor",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    case "Valor booleano":
+                    case "Valor textual":
+                    case "Valor númerico entero":
+                    case "Valor númerico decimal":
+                        {
+                            if (!(tokensLexicos[i + 1].Tipo.Equals("Operador aritmético") || tokensLexicos[i + 1].Tipo.Equals("Separador de instrucción")))
+                            {
+                                contador++;
+                                _erroresSintacticos.Add(new ErroresSintacticos()
+                                {
+                                    Error = "Se esperaba un operador aritmético o un ;",
+                                    Id = contador,
+                                    Linea = tokensLexicos[i].Linea.ToString(),
+                                    Recomendacion = "Agregar un operador aritmético o un ;",
+                                    Token = tokensLexicos[i].Texto
+                                });
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }

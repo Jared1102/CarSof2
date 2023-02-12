@@ -127,7 +127,7 @@
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(600, 500);
             this.txtCodigo.TabIndex = 0;
-            this.txtCodigo.Text = "#Ejemplo\r\n*int x=0;\r\nif(x==0)\r\n$\r\nRun.Up(500,\"front\");\r\n$$";
+            this.txtCodigo.Text = "Run.Up(500,\"front\");\r\nRun.Up(500,\"back\");\r\nRun.Stop();\r\nRun.Turn(A);\r\nwait(500);";
             // 
             // panel3
             // 
