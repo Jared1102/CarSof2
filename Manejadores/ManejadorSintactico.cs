@@ -22,7 +22,6 @@ namespace Manejadores
             ArbolSintactico arbolSintactico=null;
             contador = 0;
 
-
             //Juntar tokens para las instrucciones
             List<TokensLexico> tokensLexicos=new List<TokensLexico>();
 
@@ -84,14 +83,20 @@ namespace Manejadores
                         case "Valor textual":
                         case "Valor númerico entero":
                         case "Valor númerico decimal":
+                        case "Operador aritmético":
+                        case "Operador de comparación":
+                        case "Operador de asignación":
+                        case "Apertura de parametros":
+                        case "Cierre de parametros":
+                        case "Separador":
                             contador++;
                             _erroresSintacticos.Add(new ErroresSintacticos()
                             {
                                 Error = "La expresión utilizada no coincide con alguna instrucción posible",
                                 Id = contador,
-                                Linea = tokens[i].Linea.ToString(),
+                                Linea = tokensLexicos[0].Linea.ToString(),
                                 Recomendacion = "Reformular instrucción",
-                                Token = tokens[i].Texto
+                                Token = tokensLexicos[0].Texto
                             });
                             tokensLexicos.Clear();
                             break;
