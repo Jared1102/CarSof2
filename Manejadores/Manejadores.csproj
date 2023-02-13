@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ManejadorLexico.cs" />
+    <Compile Include="ManejadorSemantico.cs" />
     <Compile Include="ManejadorSintactico.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

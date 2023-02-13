@@ -43,6 +43,10 @@
             this.panel8 = new System.Windows.Forms.Panel();
             this.btnSintactico = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.panel10 = new System.Windows.Forms.Panel();
+            this.btnSemantico = new System.Windows.Forms.Button();
+            this.panel11 = new System.Windows.Forms.Panel();
+            this.dtgSemantica = new System.Windows.Forms.DataGridView();
             this.panel2.SuspendLayout();
             this.panel9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dtgSintactico)).BeginInit();
@@ -53,10 +57,14 @@
             this.panel7.SuspendLayout();
             this.panel8.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.panel10.SuspendLayout();
+            this.panel11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dtgSemantica)).BeginInit();
             this.SuspendLayout();
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.panel11);
             this.panel2.Controls.Add(this.panel9);
             this.panel2.Controls.Add(this.panel5);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
@@ -127,7 +135,8 @@
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(600, 500);
             this.txtCodigo.TabIndex = 0;
-            this.txtCodigo.Text = "Run.Up(500,\"front\");\r\nRun.Up(500,\"back\");\r\nRun.Stop();\r\nRun.Turn(A);\r\nwait(500);";
+            this.txtCodigo.Text = "Off();\r\n*int x=10;\r\nwait(500);\r\nOn();\r\nRun.Up(500,\"front\");\r\nRun.Up(500,\"back\");\r" +
+    "\nRun.Stop();\r\nRun.Turn(A);\r\n";
             // 
             // panel3
             // 
@@ -196,6 +205,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.panel10);
             this.panel1.Controls.Add(this.panel8);
             this.panel1.Controls.Add(this.panel7);
             this.panel1.Controls.Add(this.panel6);
@@ -204,6 +214,49 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1200, 100);
             this.panel1.TabIndex = 0;
+            // 
+            // panel10
+            // 
+            this.panel10.Controls.Add(this.btnSemantico);
+            this.panel10.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel10.Location = new System.Drawing.Point(600, 0);
+            this.panel10.Name = "panel10";
+            this.panel10.Size = new System.Drawing.Size(300, 100);
+            this.panel10.TabIndex = 3;
+            // 
+            // btnSemantico
+            // 
+            this.btnSemantico.Location = new System.Drawing.Point(95, 20);
+            this.btnSemantico.Name = "btnSemantico";
+            this.btnSemantico.Size = new System.Drawing.Size(110, 60);
+            this.btnSemantico.TabIndex = 1;
+            this.btnSemantico.Text = "Compilar Semántico";
+            this.btnSemantico.UseVisualStyleBackColor = true;
+            this.btnSemantico.Visible = false;
+            this.btnSemantico.Click += new System.EventHandler(this.btnSemantico_Click);
+            // 
+            // panel11
+            // 
+            this.panel11.Controls.Add(this.dtgSemantica);
+            this.panel11.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel11.Location = new System.Drawing.Point(0, 400);
+            this.panel11.Name = "panel11";
+            this.panel11.Size = new System.Drawing.Size(600, 200);
+            this.panel11.TabIndex = 3;
+            // 
+            // dtgSemantica
+            // 
+            this.dtgSemantica.AllowUserToAddRows = false;
+            this.dtgSemantica.AllowUserToDeleteRows = false;
+            this.dtgSemantica.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dtgSemantica.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dtgSemantica.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dtgSemantica.Location = new System.Drawing.Point(0, 0);
+            this.dtgSemantica.Name = "dtgSemantica";
+            this.dtgSemantica.ReadOnly = true;
+            this.dtgSemantica.RowHeadersVisible = false;
+            this.dtgSemantica.Size = new System.Drawing.Size(600, 200);
+            this.dtgSemantica.TabIndex = 0;
             // 
             // FrmMain
             // 
@@ -231,6 +284,9 @@
             this.panel7.ResumeLayout(false);
             this.panel8.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
+            this.panel10.ResumeLayout(false);
+            this.panel11.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dtgSemantica)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -251,6 +307,10 @@
         private System.Windows.Forms.Panel panel8;
         private System.Windows.Forms.Button btnSintactico;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel11;
+        private System.Windows.Forms.DataGridView dtgSemantica;
+        private System.Windows.Forms.Panel panel10;
+        private System.Windows.Forms.Button btnSemantico;
     }
 }
 

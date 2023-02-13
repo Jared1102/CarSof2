@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArbolSintactico.cs" />
+    <Compile Include="ErroresSemanticos.cs" />
     <Compile Include="ErroresSintacticos.cs" />
     <Compile Include="TokensLexico.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

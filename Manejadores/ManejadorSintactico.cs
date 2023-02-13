@@ -10,15 +10,15 @@ namespace Manejadores
 {
     public class ManejadorSintactico
     {
-        private List<ErroresSintacticos> _erroresSintacticos;
-        private List<ArbolSintactico> _arbolesSintacticos;
+        private List<ErroresSintacticos> _erroresSintacticos=new List<ErroresSintacticos>();
+        private List<ArbolSintactico> _arbolesSintacticos= new List<ArbolSintactico>();
         private int contador;
 
 
-        public void HacerSintactico(List<TokensLexico> tokens, DataGridView tabla)
+        public List<ArbolSintactico> HacerSintactico(List<TokensLexico> tokens, DataGridView tabla)
         {
-            _erroresSintacticos = new List<ErroresSintacticos>();
-            _arbolesSintacticos=new List<ArbolSintactico>();
+            _erroresSintacticos.Clear();
+            _arbolesSintacticos.Clear();
             ArbolSintactico arbolSintactico=null;
             contador = 0;
 
@@ -34,7 +34,7 @@ namespace Manejadores
                     arbolSintactico = new ArbolSintactico()
                     {
                         Nombre = "Condición",
-                        TokensLexicos = tokensLexicos
+                        TokensLexicos = tokensLexicos.ToList()
                     };
                     tokensLexicos.Clear();
                 }
@@ -49,7 +49,7 @@ namespace Manejadores
                             arbolSintactico=new ArbolSintactico()
                             {
                                 Nombre="Declaración de variable",
-                                TokensLexicos=tokensLexicos
+                                TokensLexicos=tokensLexicos.ToList()
                             };
                             tokensLexicos.Clear();
                             break;
@@ -58,7 +58,7 @@ namespace Manejadores
                             arbolSintactico = new ArbolSintactico()
                             {
                                 Nombre = "Expresión de asignación",
-                                TokensLexicos = tokensLexicos
+                                TokensLexicos = tokensLexicos.ToList()
                             };
                             tokensLexicos.Clear();
                             break;
@@ -67,7 +67,7 @@ namespace Manejadores
                             arbolSintactico = new ArbolSintactico()
                             {
                                 Nombre = "Cierre de bloque",
-                                TokensLexicos = tokensLexicos
+                                TokensLexicos = tokensLexicos.ToList()
                             };
                             tokensLexicos.Clear();
                             break;
@@ -75,7 +75,7 @@ namespace Manejadores
                             arbolSintactico = new ArbolSintactico()
                             {
                                 Nombre = "Apertura de bloque",
-                                TokensLexicos = tokensLexicos
+                                TokensLexicos = tokensLexicos.ToList()
                             };
                             tokensLexicos.Clear();
                             break;
@@ -105,11 +105,9 @@ namespace Manejadores
                             arbolSintactico = new ArbolSintactico()
                             {
                                 Nombre = "Instrucción",
-                                TokensLexicos= tokensLexicos
+                                TokensLexicos= tokensLexicos.ToList()
                             };
                             tokensLexicos.Clear();
-                            break;
-                        default:
                             break;
                     }
                 }
@@ -142,6 +140,7 @@ namespace Manejadores
             }
 
             tabla.DataSource = _erroresSintacticos.ToList();
+            return _arbolesSintacticos.ToList();
         }
 
         private void sintaxisInstrucciones(List<TokensLexico> tokensLexicos)
@@ -314,6 +313,8 @@ namespace Manejadores
 
         private void sintaxisRunUp(List<TokensLexico> tokensLexicos)
         {
+            bool parametros = true;
+            int separador = 0;
             for (int i = 0; i < tokensLexicos.Count-1; i++)
             {
                 switch (tokensLexicos[i].Tipo)
@@ -389,6 +390,8 @@ namespace Manejadores
                         break;
                     case "Separador":
                         {
+                            separador = i;
+                            parametros = false;
                             if (!(tokensLexicos[i + 1].Tipo.Equals("Identificador") || tokensLexicos[i + 1].Tipo.Contains("Valor")))
                             {
                                 contador++;
@@ -406,6 +409,20 @@ namespace Manejadores
                     default:
                         break;
                 }
+
+            }
+
+            if (parametros)
+            {
+                contador++;
+                _erroresSintacticos.Add(new ErroresSintacticos()
+                {
+                    Error = "Se esperaban 2 parametros",
+                    Id = contador,
+                    Linea = tokensLexicos[separador].Linea.ToString(),
+                    Recomendacion = "Agregar una apertura de parametros",
+                    Token = tokensLexicos[separador].Texto
+                });
             }
         }
 
@@ -460,10 +477,10 @@ namespace Manejadores
                                 contador++;
                                 _erroresSintacticos.Add(new ErroresSintacticos()
                                 {
-                                    Error = "Se esperaba un operador de comparación, aritmético o un )",
+                                    Error = "Se esperaba un operador de comparación o un )",
                                     Id = contador,
                                     Linea = tokensLexicos[i].Linea.ToString(),
-                                    Recomendacion = "Agregar un operador de comparación, aritmético o un )",
+                                    Recomendacion = "Agregar un operador de comparación o un )",
                                     Token = tokensLexicos[i].Texto
                                 });
                             }

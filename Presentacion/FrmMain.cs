@@ -16,12 +16,16 @@ namespace Presentacion
     {
         private ManejadorLexico _manejadorLexico;
         private ManejadorSintactico _manejadorSintactico;
+        private ManejadorSemantico _manejadorSemantico;
+
         private List<TokensLexico> _listTokens;
+        private List<ArbolSintactico> _arbolSintacticos;
         public FrmMain()
         {
             InitializeComponent();
             _manejadorLexico= new ManejadorLexico();
             _manejadorSintactico = new ManejadorSintactico();
+            _manejadorSemantico = new ManejadorSemantico();
         }
 
         private void btnLexico_Click(object sender, EventArgs e)
@@ -40,7 +44,16 @@ namespace Presentacion
 
         private void btnSintactico_Click(object sender, EventArgs e)
         {
-            _manejadorSintactico.HacerSintactico(_listTokens, dtgSintactico);
+            _arbolSintacticos=_manejadorSintactico.HacerSintactico(_listTokens, dtgSintactico);
+            if (_arbolSintacticos.Count>0)
+            {
+                btnSemantico.Visible = true;
+            }
+        }
+
+        private void btnSemantico_Click(object sender, EventArgs e)
+        {
+            _manejadorSemantico.HacerSemantica(_arbolSintacticos, dtgSemantica);
         }
     }
 }
