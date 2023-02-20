@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.panel2 = new System.Windows.Forms.Panel();
+            this.panel11 = new System.Windows.Forms.Panel();
+            this.dtgSemantica = new System.Windows.Forms.DataGridView();
             this.panel9 = new System.Windows.Forms.Panel();
             this.dtgSintactico = new System.Windows.Forms.DataGridView();
             this.panel5 = new System.Windows.Forms.Panel();
@@ -45,9 +47,9 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel10 = new System.Windows.Forms.Panel();
             this.btnSemantico = new System.Windows.Forms.Button();
-            this.panel11 = new System.Windows.Forms.Panel();
-            this.dtgSemantica = new System.Windows.Forms.DataGridView();
             this.panel2.SuspendLayout();
+            this.panel11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dtgSemantica)).BeginInit();
             this.panel9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dtgSintactico)).BeginInit();
             this.panel5.SuspendLayout();
@@ -58,8 +60,6 @@
             this.panel8.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel10.SuspendLayout();
-            this.panel11.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dtgSemantica)).BeginInit();
             this.SuspendLayout();
             // 
             // panel2
@@ -72,6 +72,29 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(600, 600);
             this.panel2.TabIndex = 1;
+            // 
+            // panel11
+            // 
+            this.panel11.Controls.Add(this.dtgSemantica);
+            this.panel11.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel11.Location = new System.Drawing.Point(0, 400);
+            this.panel11.Name = "panel11";
+            this.panel11.Size = new System.Drawing.Size(600, 200);
+            this.panel11.TabIndex = 3;
+            // 
+            // dtgSemantica
+            // 
+            this.dtgSemantica.AllowUserToAddRows = false;
+            this.dtgSemantica.AllowUserToDeleteRows = false;
+            this.dtgSemantica.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dtgSemantica.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dtgSemantica.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dtgSemantica.Location = new System.Drawing.Point(0, 0);
+            this.dtgSemantica.Name = "dtgSemantica";
+            this.dtgSemantica.ReadOnly = true;
+            this.dtgSemantica.RowHeadersVisible = false;
+            this.dtgSemantica.Size = new System.Drawing.Size(600, 200);
+            this.dtgSemantica.TabIndex = 0;
             // 
             // panel9
             // 
@@ -154,6 +177,7 @@
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(300, 100);
             this.panel6.TabIndex = 0;
+            this.panel6.Visible = false;
             // 
             // btnLexico
             // 
@@ -182,6 +206,7 @@
             this.btnTodo.TabIndex = 0;
             this.btnTodo.Text = "Compilar Todo";
             this.btnTodo.UseVisualStyleBackColor = true;
+            this.btnTodo.Click += new System.EventHandler(this.btnTodo_Click);
             // 
             // panel8
             // 
@@ -191,6 +216,7 @@
             this.panel8.Name = "panel8";
             this.panel8.Size = new System.Drawing.Size(300, 100);
             this.panel8.TabIndex = 2;
+            this.panel8.Visible = false;
             // 
             // btnSintactico
             // 
@@ -223,6 +249,7 @@
             this.panel10.Name = "panel10";
             this.panel10.Size = new System.Drawing.Size(300, 100);
             this.panel10.TabIndex = 3;
+            this.panel10.Visible = false;
             // 
             // btnSemantico
             // 
@@ -234,29 +261,6 @@
             this.btnSemantico.UseVisualStyleBackColor = true;
             this.btnSemantico.Visible = false;
             this.btnSemantico.Click += new System.EventHandler(this.btnSemantico_Click);
-            // 
-            // panel11
-            // 
-            this.panel11.Controls.Add(this.dtgSemantica);
-            this.panel11.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel11.Location = new System.Drawing.Point(0, 400);
-            this.panel11.Name = "panel11";
-            this.panel11.Size = new System.Drawing.Size(600, 200);
-            this.panel11.TabIndex = 3;
-            // 
-            // dtgSemantica
-            // 
-            this.dtgSemantica.AllowUserToAddRows = false;
-            this.dtgSemantica.AllowUserToDeleteRows = false;
-            this.dtgSemantica.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dtgSemantica.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dtgSemantica.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dtgSemantica.Location = new System.Drawing.Point(0, 0);
-            this.dtgSemantica.Name = "dtgSemantica";
-            this.dtgSemantica.ReadOnly = true;
-            this.dtgSemantica.RowHeadersVisible = false;
-            this.dtgSemantica.Size = new System.Drawing.Size(600, 200);
-            this.dtgSemantica.TabIndex = 0;
             // 
             // FrmMain
             // 
@@ -274,6 +278,8 @@
             this.Text = "CarSof";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.panel2.ResumeLayout(false);
+            this.panel11.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dtgSemantica)).EndInit();
             this.panel9.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dtgSintactico)).EndInit();
             this.panel5.ResumeLayout(false);
@@ -285,8 +291,6 @@
             this.panel8.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel10.ResumeLayout(false);
-            this.panel11.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dtgSemantica)).EndInit();
             this.ResumeLayout(false);
 
         }

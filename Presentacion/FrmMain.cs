@@ -55,5 +55,15 @@ namespace Presentacion
         {
             _manejadorSemantico.HacerSemantica(_arbolSintacticos, dtgSemantica);
         }
+
+        private void btnTodo_Click(object sender, EventArgs e)
+        {
+            _listTokens = _manejadorLexico.HacerLexico(txtCodigo.Text, dtgLexico);
+            _arbolSintacticos = _manejadorSintactico.HacerSintactico(_listTokens, dtgSintactico);
+            if (_arbolSintacticos.Count > 0)
+            {
+                _manejadorSemantico.HacerSemantica(_arbolSintacticos, dtgSemantica);
+            }
+        }
     }
 }

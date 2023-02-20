@@ -100,6 +100,8 @@ namespace Manejadores
                 });
             }
 
+
+
             tabla.DataSource = _erroresSemanticos.ToList();
         }
     }
