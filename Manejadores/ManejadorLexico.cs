@@ -18,6 +18,12 @@ namespace Manejadores
             _tokens.Clear();
             codigo = codigo.Replace("=", " = ");
             codigo=codigo.Replace("=  =", "==");
+            codigo = codigo.Replace("!", " ! ");
+            codigo = codigo.Replace("!  =", "!=");
+            codigo = codigo.Replace(">", " > ");
+            codigo = codigo.Replace("<", " < ");
+            codigo = codigo.Replace(">  =", ">=");
+            codigo = codigo.Replace("<  =", "<=");
             codigo = codigo.Replace("(", " ( ");
             codigo = codigo.Replace(")", " ) ");
             codigo = codigo.Replace(",", " , ");

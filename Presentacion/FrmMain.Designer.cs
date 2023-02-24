@@ -158,8 +158,8 @@
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(600, 500);
             this.txtCodigo.TabIndex = 0;
-            this.txtCodigo.Text = "Off();\r\n*int x=10;\r\nwait(500);\r\nOn();\r\nRun.Up(500,\"front\");\r\nRun.Up(500,\"back\");\r" +
-    "\nRun.Stop();\r\nRun.Turn(A);\r\n";
+            this.txtCodigo.Text = "*int x=1;\r\nRun.Up(1,\"front\");";
+            this.txtCodigo.TextChanged += new System.EventHandler(this.txtCodigo_TextChanged);
             // 
             // panel3
             // 
@@ -177,7 +177,6 @@
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(300, 100);
             this.panel6.TabIndex = 0;
-            this.panel6.Visible = false;
             // 
             // btnLexico
             // 
@@ -216,7 +215,6 @@
             this.panel8.Name = "panel8";
             this.panel8.Size = new System.Drawing.Size(300, 100);
             this.panel8.TabIndex = 2;
-            this.panel8.Visible = false;
             // 
             // btnSintactico
             // 
@@ -249,7 +247,6 @@
             this.panel10.Name = "panel10";
             this.panel10.Size = new System.Drawing.Size(300, 100);
             this.panel10.TabIndex = 3;
-            this.panel10.Visible = false;
             // 
             // btnSemantico
             // 
