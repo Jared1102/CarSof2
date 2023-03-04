@@ -17,6 +17,7 @@ namespace Presentacion
         private ManejadorLexico _manejadorLexico;
         private ManejadorSintactico _manejadorSintactico;
         private ManejadorSemantico _manejadorSemantico;
+        private ManejadorTraductor _manejadorTraductor;
 
         private List<TokensLexico> _listTokens;
         private List<ArbolSintactico> _arbolSintacticos;
@@ -26,6 +27,7 @@ namespace Presentacion
             _manejadorLexico= new ManejadorLexico();
             _manejadorSintactico = new ManejadorSintactico();
             _manejadorSemantico = new ManejadorSemantico();
+            _manejadorTraductor = new ManejadorTraductor();
         }
 
         #region Funciones
@@ -33,8 +35,7 @@ namespace Presentacion
         private void limpiarTablas()
         {
             dtgLexico.Columns.Clear();
-            dtgSemantica.Columns.Clear();
-            dtgSintactico.Columns.Clear();
+            dtgErrores.Columns.Clear();
             btnSemantico.Visible= false;
             btnSintactico.Visible= false;
         }
@@ -58,7 +59,7 @@ namespace Presentacion
 
         private void btnSintactico_Click(object sender, EventArgs e)
         {
-            _arbolSintacticos=_manejadorSintactico.HacerSintactico(_listTokens, dtgSintactico);
+            _arbolSintacticos=_manejadorSintactico.HacerSintactico(_listTokens, dtgErrores);
             if (_arbolSintacticos.Count>0)
             {
                 btnSemantico.Visible = true;
@@ -67,23 +68,44 @@ namespace Presentacion
 
         private void btnSemantico_Click(object sender, EventArgs e)
         {
-            _manejadorSemantico.HacerSemantica(_arbolSintacticos, dtgSemantica, _listTokens);
+            _manejadorSemantico.HacerSemantica(_arbolSintacticos, dtgErrores, _listTokens);
         }
 
         private void btnTodo_Click(object sender, EventArgs e)
         {
             limpiarTablas();
             _listTokens = _manejadorLexico.HacerLexico(txtCodigo.Text, dtgLexico);
-            _arbolSintacticos = _manejadorSintactico.HacerSintactico(_listTokens, dtgSintactico);
+            _arbolSintacticos = _manejadorSintactico.HacerSintactico(_listTokens, dtgErrores);
             if (_arbolSintacticos.Count > 0)
             {
-                _manejadorSemantico.HacerSemantica(_arbolSintacticos, dtgSemantica, _listTokens);
+                _manejadorSemantico.HacerSemantica(_arbolSintacticos, dtgErrores, _listTokens);
             }
         }
 
         private void txtCodigo_TextChanged(object sender, EventArgs e)
         {
             limpiarTablas();
+        }
+
+        private void btnTraducir_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (cmbPlaca.SelectedIndex != -1 && cmbPuerto.SelectedIndex!=-1)
+                {
+                    _manejadorTraductor.Traducir(txtCodigo.Text, cmbPlaca.SelectedIndex, cmbPuerto.Text);
+                }
+                else
+                {
+                    MessageBox.Show("Seleccione una placa o un puerto");
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
         }
     }
 }
