@@ -35,8 +35,8 @@
             this.guardarComoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.salirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configuracionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ayudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.arduinoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ayudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel5 = new System.Windows.Forms.Panel();
             this.dtgErrores = new System.Windows.Forms.DataGridView();
@@ -130,18 +130,18 @@
             this.configuracionToolStripMenuItem.Size = new System.Drawing.Size(95, 19);
             this.configuracionToolStripMenuItem.Text = "Configuracion";
             // 
+            // arduinoToolStripMenuItem
+            // 
+            this.arduinoToolStripMenuItem.Name = "arduinoToolStripMenuItem";
+            this.arduinoToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+            this.arduinoToolStripMenuItem.Text = "Arduino";
+            this.arduinoToolStripMenuItem.Click += new System.EventHandler(this.arduinoToolStripMenuItem_Click);
+            // 
             // ayudaToolStripMenuItem
             // 
             this.ayudaToolStripMenuItem.Name = "ayudaToolStripMenuItem";
             this.ayudaToolStripMenuItem.Size = new System.Drawing.Size(53, 19);
             this.ayudaToolStripMenuItem.Text = "Ayuda";
-            // 
-            // arduinoToolStripMenuItem
-            // 
-            this.arduinoToolStripMenuItem.Name = "arduinoToolStripMenuItem";
-            this.arduinoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.arduinoToolStripMenuItem.Text = "Arduino";
-            this.arduinoToolStripMenuItem.Click += new System.EventHandler(this.arduinoToolStripMenuItem_Click);
             // 
             // panel1
             // 
@@ -230,7 +230,8 @@
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(400, 567);
             this.txtCodigo.TabIndex = 1;
-            this.txtCodigo.Text = "*int x=1;\r\nRun.Up(1,\"front\");";
+            this.txtCodigo.Text = "*int x=1;\r\n*bool y=T;\r\n*string cadena=\"JEJE\";\r\nRun.Up(1,\"front\");\r\nif(y)\r\n$\r\nx=10" +
+    ";\r\nwait(500);\r\n$$";
             // 
             // panel2
             // 

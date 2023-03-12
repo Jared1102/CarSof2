@@ -10,10 +10,10 @@ namespace Manejadores
 {
     public class ManejadorTraductor
     {
-        public string Traducir(List<TokensLexico> _listTokens,List<string> pines)
+        string codigoArduino = "", global = "#include <Servo.h>\r\n", setup = "\r\nvoid setup(){\r\n", loop = "}\r\n\r\nvoid loop(){\r\n", definicionFunction = "}\r\n";
+        public string Traducir(List<ArbolSintactico> arbolSintacticos, List<string> pines)
         {
-            string global = "#include <Servo.h>\r\n", setup = "\r\nvoid setup(){\r\n", loop= "}\r\n\r\nvoid loop(){\r\n", definicionFunction= "}\r\n";
-
+            string anterior = "";
             global += "Servo servoMotor;\r\n";
 
             for (int i = 0; i < pines.Count-1; i++)
@@ -23,7 +23,163 @@ namespace Manejadores
             
             setup += string.Format("\tservoMotor.attach({0});\r\n\tSerial.begin(9600);\r\n", pines[pines.Count-1]);
 
-            string codigoArduino = string.Format("{0}{1}{2}{3}", global,setup,loop,definicionFunction);
+            for (int i = 0; i < arbolSintacticos.Count; i++)
+            {
+                switch (arbolSintacticos[i].Nombre)
+                {
+                    case "Condición":
+                        {
+                            loop += "\t";
+                            for (int j = 0; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                            {
+                                loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                            }
+                            loop += "\r\n";
+                        }
+                        break;
+                    case "Declaración de variable":
+                        {
+                            for (int j = 0; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                            {
+                                switch (arbolSintacticos[i].TokensLexicos[j].Tipo)
+                                {
+                                    case "Tipo de dato":
+                                        {
+                                            switch (arbolSintacticos[i].TokensLexicos[j].Texto)
+                                            {
+                                                case "*int":
+                                                    {
+                                                        global += "int ";
+                                                    }break;
+                                                case "*decimal":
+                                                    {
+                                                        global += "double ";
+                                                    }
+                                                    break;
+                                                case "*string":
+                                                    {
+                                                        global += "char ";
+                                                    }
+                                                    break;
+                                                case "*bool":
+                                                    {
+                                                        global = "#include <stdbool.h>\r\n" + global;
+                                                        global += "bool ";
+                                                    }
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                    case "Identificador":
+                                        {
+                                            if (arbolSintacticos[i].TokensLexicos[j-1].Texto.Equals("*string"))
+                                            {
+                                                global += string.Format("{0}[]", arbolSintacticos[i].TokensLexicos[j].Texto);
+                                            }
+                                            else
+                                            {
+                                                global += string.Format("{0}", arbolSintacticos[i].TokensLexicos[j].Texto);
+                                            }
+                                        }break;
+                                    case "Operador de asignación":
+                                        {
+                                            global += "=";
+                                        }
+                                        break;
+                                    case "Valor textual":
+                                    case "Valor númerico entero":
+                                    case "Valor númerico decimal":
+                                        {
+                                            global+= arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        break;
+                                    case "Valor booleano":
+                                        {
+                                            switch (arbolSintacticos[i].TokensLexicos[j].Texto)
+                                            {
+                                                case "T":
+                                                    global += "true";
+                                                break;
+                                                case "F":
+                                                    global += "false";
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                    case "Separador de instrucción":
+                                        {
+                                            global += ";\r\n";
+                                        }
+                                        break;
+
+                                }
+                            }
+                        }
+                        break;
+                    case "Expresión de asignación":
+                        {
+                            loop += "\t\t";
+                            for (int j = 0; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                            {
+                                switch (arbolSintacticos[i].TokensLexicos[j].Tipo)
+                                {
+                                    case "Identificador":
+                                        {
+                                            loop += string.Format("{0}", arbolSintacticos[i].TokensLexicos[j].Texto);
+                                        }
+                                        break;
+                                    case "Operador de asignación":
+                                        {
+                                            loop += "=";
+                                        }
+                                        break;
+                                    case "Valor textual":
+                                    case "Valor númerico entero":
+                                    case "Valor númerico decimal":
+                                        {
+                                            loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        break;
+                                    case "Valor booleano":
+                                        {
+                                            switch (arbolSintacticos[i].TokensLexicos[j].Texto)
+                                            {
+                                                case "T":
+                                                    loop += "true";
+                                                    break;
+                                                case "F":
+                                                    loop += "false";
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                    case "Separador de instrucción":
+                                        {
+                                            loop += ";\r\n";
+                                        }
+                                        break;
+
+                                }
+                            }
+                        }
+                        break;
+                    case "Cierre de bloque":
+                        {
+                            loop += "\t}\r\n";
+                        }
+                        break;
+                    case "Apertura de bloque":
+                        {
+                            loop+= "\t{\r\n";
+                        }
+                        break;
+                    case "Instrucción": { 
+                        
+                        } break;
+                }
+            }
+
+            codigoArduino = string.Format("{0}{1}{2}{3}", global,setup,loop,definicionFunction);
 
             return codigoArduino;
         }

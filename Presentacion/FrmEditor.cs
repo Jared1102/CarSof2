@@ -96,10 +96,12 @@ namespace Presentacion
 
         private void btnTraducir_Click(object sender, EventArgs e)
         {
+            txtTraduccion.Clear();
             if (pines.Count>0)
             {
                 _listTokens = _manejadorLexico.HacerLexico(txtCodigo.Text, dtgLexico);
-                txtTraduccion.Text = _manejadorTraductor.Traducir(_listTokens, pines);
+                _arbolSintacticos = _manejadorSintactico.HacerSintactico(_listTokens, dtgErrores);
+                txtTraduccion.Text = _manejadorTraductor.Traducir(_arbolSintacticos, pines);
             }
             else
             {

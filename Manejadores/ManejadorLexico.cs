@@ -12,76 +12,75 @@ namespace Manejadores
     public class ManejadorLexico
     {
         public List<TokensLexico> _tokens = new List<TokensLexico>();
+        private int contador;
         public List<TokensLexico> HacerLexico(string codigo,DataGridView tabla)
         {
-            int contador = 1;
+            
             _tokens.Clear();
-            codigo = codigo.Replace("=", " = ");
-            codigo=codigo.Replace("=  =", "==");
-            codigo = codigo.Replace("!", " ! ");
-            codigo = codigo.Replace("!  =", "!=");
-            codigo = codigo.Replace(">", " > ");
-            codigo = codigo.Replace("<", " < ");
-            codigo = codigo.Replace(">  =", ">=");
-            codigo = codigo.Replace("<  =", "<=");
-            codigo = codigo.Replace("(", " ( ");
-            codigo = codigo.Replace(")", " ) ");
-            codigo = codigo.Replace(",", " , ");
-            codigo = codigo.Replace(";", " ; ");
-            codigo = codigo.Replace("+", " + ");
-            codigo = codigo.Replace("-", " - ");
-            codigo = codigo.Replace("*", " * ");
-            codigo = codigo.Replace("/", " / ");
-            codigo = codigo.Replace("* int", "*int");
-            codigo = codigo.Replace("* decimal", "*decimal");
-            codigo = codigo.Replace("* string", "*string");
-            codigo = codigo.Replace("*bool", "bool");
+            contador = 1;
+            StringBuilder builder = new StringBuilder(codigo);
+            builder.Replace("=", " = ")
+                   .Replace("=  =", "==")
+                   .Replace("!", " ! ")
+                   .Replace("!  =", "!=")
+                   .Replace(">", " > ")
+                   .Replace("<", " < ")
+                   .Replace(">  =", ">=")
+                   .Replace("<  =", "<=")
+                   .Replace("(", " ( ")
+                   .Replace(")", " ) ")
+                   .Replace(",", " , ")
+                   .Replace(";", " ; ")
+                   .Replace("+", " + ")
+                   .Replace("-", " - ")
+                   .Replace("*", " * ")
+                   .Replace("/", " / ")
+                   .Replace("* int", "*int")
+                   .Replace("* decimal", "*decimal")
+                   .Replace("* string", "*string")
+                   .Replace("* bool", "*bool");
 
+            codigo = builder.ToString();
+            
             string[] lineas = codigo.Split('\n');
+            AgregarLineas(lineas, 0);
 
-            for (int i = 0; i < lineas.Length; i++)
-            {
-                if (Regex.IsMatch(lineas[i],"#"))
-                {
-                    string[] comentario = Regex.Split(lineas[i], "#");
-                    if (!string.IsNullOrEmpty(comentario[0]) && !string.IsNullOrWhiteSpace(comentario[0]) && comentario[0]!=null)
-                    {
-                        string[] tnt = comentario[0].Split(' ');
-                        for (int j = 0; j < tnt.Length; j++)
-                        {
-                            if (!string.IsNullOrEmpty(tnt[j]) && !string.IsNullOrWhiteSpace(tnt[j]))
-                            {
-                                _tokens.Add(generarToken(contador, tnt[j], i + 1));
-                                contador++;
-                            }
-                            
-                        }
-                        
-                    }
-                    /*_tokens.Add(new TokensLexico
-                    {
-                        Id= i,
-                        Linea=i+1,
-                        Texto= "#"+ comentario[1],
-                        Tipo="Comentario"
-                    });*/
-                }else if (!string.IsNullOrEmpty(lineas[i]) && !string.IsNullOrWhiteSpace(lineas[i]))
-                {
-                    string[] tnt = lineas[i].Split(' ');
-                    for (int j = 0; j < tnt.Length; j++)
-                    {
-                        if (!string.IsNullOrEmpty(tnt[j]) && !string.IsNullOrWhiteSpace(tnt[j]))
-                        {
-                            _tokens.Add(generarToken(contador, tnt[j], i + 1));
-                            contador++;
-                        }
-                    }
-                }
-                
-            }
 
             tabla.DataSource= _tokens.ToList();
             return _tokens;
+        }
+        private void AgregarLineas(string[] lineas, int i)
+        {
+            if (i >= lineas.Length) return;
+            if (lineas[i].Contains("#"))
+            {
+                string comentario = lineas[i].Substring(0, lineas[i].IndexOf("#"));
+                if (!string.IsNullOrWhiteSpace(comentario))
+                {
+                    string[] tnt = comentario.Split(' ');
+                    AgregarTokensRecursivo(tnt, 0, i + 1);
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(lineas[i]))
+            {
+                string[] tnt = lineas[i].Split(' ');
+                AgregarTokensRecursivo(tnt, 0, i + 1);
+            }
+            AgregarLineas(lineas, i + 1);
+        }
+
+        private void AgregarTokensRecursivo(string[] tnt, int index, int linea)
+        {
+            if (index == tnt.Length)
+                return;
+
+            if (!string.IsNullOrWhiteSpace(tnt[index]))
+            {
+                _tokens.Add(generarToken(contador, tnt[index], linea));
+                contador++;
+            }
+
+            AgregarTokensRecursivo(tnt, index + 1, linea);
         }
 
         private TokensLexico generarToken(int i1, string v, int i2)
@@ -130,7 +129,7 @@ namespace Manejadores
                 return "Operador de asignación";
 
             }
-            else if (v.Contains(";"))
+            else if (v.Equals(";"))
             {
                 return "Separador de instrucción";
             }
