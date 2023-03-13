@@ -13,7 +13,6 @@ namespace Manejadores
         string codigoArduino = "", global = "#include <Servo.h>\r\n", setup = "\r\nvoid setup(){\r\n", loop = "}\r\n\r\nvoid loop(){\r\n", definicionFunction = "}\r\n";
         public string Traducir(List<ArbolSintactico> arbolSintacticos, List<string> pines)
         {
-            string anterior = "";
             global += "Servo servoMotor;\r\n";
 
             for (int i = 0; i < pines.Count-1; i++)
