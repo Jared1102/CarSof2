@@ -230,8 +230,8 @@
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(400, 567);
             this.txtCodigo.TabIndex = 1;
-            this.txtCodigo.Text = "*int x=1;\r\n*bool y=T;\r\n*string cadena=\"JEJE\";\r\nRun.Up(1,\"front\");\r\nif(y)\r\n$\r\nx=10" +
-    ";\r\nwait(500);\r\n$$";
+            this.txtCodigo.Text = "*int x=1;\r\n*bool y=T;\r\n*string cadena=\"JEJE\";\r\nOn();\r\nRun.Up(1,\"front\");\r\nif(y)\r\n" +
+    "$\r\nRun.Turn(180);\r\nRun.Stop();\r\nx=10;\r\nwait(500);\r\nOff();\r\n$$";
             // 
             // panel2
             // 

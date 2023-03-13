@@ -86,9 +86,9 @@ namespace Manejadores
                                             global += "=";
                                         }
                                         break;
+                                    case "Valor numérico entero":
                                     case "Valor textual":
-                                    case "Valor númerico entero":
-                                    case "Valor númerico decimal":
+                                    case "Valor numérico decimal":
                                         {
                                             global+= arbolSintacticos[i].TokensLexicos[j].Texto;
                                         }
@@ -134,8 +134,8 @@ namespace Manejadores
                                         }
                                         break;
                                     case "Valor textual":
-                                    case "Valor númerico entero":
-                                    case "Valor númerico decimal":
+                                    case "Valor numérico entero":
+                                    case "Valor numérico decimal":
                                         {
                                             loop += arbolSintacticos[i].TokensLexicos[j].Texto;
                                         }
@@ -173,8 +173,123 @@ namespace Manejadores
                             loop+= "\t{\r\n";
                         }
                         break;
-                    case "Instrucción": { 
-                        
+                    case "Instrucción": {
+                            if (!global.Contains("#include <Car.h>"))
+                            {
+                                global = "#include <Car.h>\r\n" + global;
+                                global += "Car car;";
+                            }
+
+                            switch (arbolSintacticos[i].TokensLexicos[0].Texto)
+                            {
+                                case "Run.Up":
+                                    {
+                                        loop += "\tcar.Up";
+                                        for (int j = 1; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                                        {
+                                            if (j==1)
+                                            {
+                                                loop += string.Format("{0}{1},{2},{3},{4},{5},{6},",
+                                                    arbolSintacticos[i].TokensLexicos[j].Texto,
+                                                    pines[0],
+                                                    pines[1],
+                                                    pines[2],
+                                                    pines[3],
+                                                    pines[4],
+                                                    pines[5]);
+                                            }else
+                                                loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        loop += "\r\n";
+                                    }
+                                    break;
+                                case "Run.Stop":
+                                    {
+                                        loop += "\tcar.Stop";
+                                        for (int j = 1; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                                        {
+                                            if (j == 1)
+                                            {
+                                                loop += string.Format("{0}{1},{2},{3},{4},{5},{6}",
+                                                    arbolSintacticos[i].TokensLexicos[j].Texto,
+                                                    pines[0],
+                                                    pines[1],
+                                                    pines[2],
+                                                    pines[3],
+                                                    pines[4],
+                                                    pines[5]);
+                                            }
+                                            else
+                                                loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        loop += "\r\n";
+                                    }
+                                    break;
+                                case "On":
+                                    {
+                                        loop += "\tcar.On";
+                                        for (int j = 1; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                                        {
+                                            if (j == 1)
+                                            {
+                                                loop += string.Format("{0}{1},{2}",
+                                                    arbolSintacticos[i].TokensLexicos[j].Texto,
+                                                    pines[0],
+                                                    pines[3]);
+                                            }
+                                            else
+                                                loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        loop += "\r\n";
+                                    }
+                                    break;
+                                case "Off":
+                                    {
+                                        loop += "\tcar.Off";
+                                        for (int j = 1; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                                        {
+                                            if (j == 1)
+                                            {
+                                                loop += string.Format("{0}{1},{2}",
+                                                    arbolSintacticos[i].TokensLexicos[j].Texto,
+                                                    pines[0],
+                                                    pines[3]);
+                                            }
+                                            else
+                                                loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        loop += "\r\n";
+                                    }
+                                    break;
+                                case "Run.Turn":
+                                    {
+                                        loop += "\tcar.Turn";
+                                        for (int j = 1; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                                        {
+                                            if (j == 1)
+                                            {
+                                                loop += string.Format("{0}{1},",
+                                                    arbolSintacticos[i].TokensLexicos[j].Texto,
+                                                    pines[6]);
+                                            }
+                                            else
+                                                loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        loop += "\r\n";
+                                    }
+                                    break;
+                                case "wait":
+                                    {
+                                        loop += "\tdelay";
+                                        for (int j = 1; j < arbolSintacticos[i].TokensLexicos.Count; j++)
+                                        {
+                                            loop += arbolSintacticos[i].TokensLexicos[j].Texto;
+                                        }
+                                        loop += "\r\n";
+                                    }
+                                    break;
+                            }
+
                         } break;
                 }
             }

@@ -38,7 +38,8 @@ namespace Manejadores
                    .Replace("* int", "*int")
                    .Replace("* decimal", "*decimal")
                    .Replace("* string", "*string")
-                   .Replace("* bool", "*bool");
+                   .Replace("* bool", "*bool")
+                   .Replace("\r","");
 
             codigo = builder.ToString();
             
@@ -96,80 +97,71 @@ namespace Manejadores
 
         private string identificarTipo(string v)
         {
-            string[] tipoDato = { "*int", "*decimal", "*string", "*bool" };
-            string[] instrucciones = { "Run.Up", "Run.Stop", "Run.Turn", "On", "Off", "wait" };
-            string[] operadorAritmetico = { "+", "-", "/", "*" };
-            string[] operadorComparacion = { "==", "!=", ">", "<", ">=", "<=" };
+            HashSet<string> tipoDato = new HashSet<string>(new string[] { "*int", "*decimal", "*string", "*bool" });
+            HashSet<string> instrucciones = new HashSet<string>(new string[] { "Run.Up", "Run.Stop", "Run.Turn", "On", "Off", "wait" });
+            HashSet<string> operadorAritmetico = new HashSet<string>(new string[] { "+", "-", "/", "*" });
+            HashSet<string> operadorComparacion = new HashSet<string>(new string[] { "==", "!=", ">", "<", ">=", "<=" });
 
-            if (tipoDato.Contains(v))
+            switch (v)
             {
-                return "Tipo de dato";
-            }else if(v.Equals("T") || v.Equals("F"))
-            {
-                return "Valor booleano";
-            }
-            else if(v.Equals("if")){
-                return "Condicional";
-            }else if (instrucciones.Contains(v))
-            {
-                return "Instrucción";
-            }
-            else if (identificarIdentificador(v))
-            {
-                return "Identificador";
-            }else if (operadorAritmetico.Contains(v))
-            {
-                return "Operador aritmético";
-            }else if (operadorComparacion.Contains(v))
-            {
-                return "Operador de comparación";
-            }
-            else if (v.Equals("="))
-            {
-                return "Operador de asignación";
-
-            }
-            else if (v.Equals(";"))
-            {
-                return "Separador de instrucción";
-            }
-            else if (v.Contains("("))
-            {
-                return "Apertura de parametros";
-            }
-            else if (v.Contains(")"))
-            {
-                return "Cierre de parametros";
-            }
-            else if (v.Contains("$$"))
-            {
-                return "Cierre de bloque";
-            }
-            else if (v.Contains("$"))
-            {
-                return "Apertura de bloque";
-            }
-            else if (v.Contains(","))
-            {
-                return "Separador";
-            }else if (identificarValorTextual(v))
-            {
-                return "Valor textual";
-            }
-            else if (identificarValorEntero(v))
-            {
-                return "Valor númerico entero";
-            }
-            else if (identificarValorDecimal(v))
-            {
-                return "Valor númerico decimal";
-            }
-            else
-            {
-                return "No identificado";
+                case "T":
+                case "F":
+                    return "Valor booleano";
+                case "if":
+                    return "Condicional";
+                case "=":
+                    return "Operador de asignación";
+                case ";":
+                    return "Separador de instrucción";
+                case ",":
+                    return "Separador";
+                case "(":
+                    return "Apertura de parametros";
+                case ")":
+                    return "Cierre de parametros";
+                case "$":
+                    return "Apertura de bloque";
+                case "$$":
+                    return "Cierre de bloque";
+                default:
+                    if (tipoDato.Contains(v))
+                    {
+                        return "Tipo de dato";
+                    }
+                    else if (instrucciones.Contains(v))
+                    {
+                        return "Instrucción";
+                    }
+                    else if (identificarIdentificador(v))
+                    {
+                        return "Identificador";
+                    }
+                    else if (operadorAritmetico.Contains(v))
+                    {
+                        return "Operador aritmético";
+                    }
+                    else if (operadorComparacion.Contains(v))
+                    {
+                        return "Operador de comparación";
+                    }
+                    else if (identificarValorTextual(v))
+                    {
+                        return "Valor textual";
+                    }
+                    else if (identificarValorEntero(v))
+                    {
+                        return "Valor numérico entero";
+                    }
+                    else if (identificarValorDecimal(v))
+                    {
+                        return "Valor numérico decimal";
+                    }
+                    else
+                    {
+                        return "No identificado";
+                    }
             }
         }
-
         private bool identificarValorDecimal(string v)
         {
             return Regex.IsMatch(v, @"^[0-9]\d*(\.\d+)?$");
